@@ -1,41 +1,38 @@
-# gpt-6-astra
+# Astra
 
-A from-scratch reproduction of the GPT-6 Astra launch-page star-field hero (the
-spiral galaxy), built only with [vgpu](https://vgpu.sh) (WebGPU) inside Next.js.
+![Astra](./app/opengraph-image.png)
 
-- A compute pass flows ~4,600 stars along the five SVG strokes that draw the "6"
-  (viewBox 231x325, taken from the launch page), converges them from a scattered
-  sky during the intro, and runs a pointer-repel simulation. Strokes that end
-  nearer the core flow forward and the rest flow backward, so the arms counter-rotate.
-- Additive instanced quads draw the stars into an HDR (`rgba16float`) scene.
-- A bloom chain (half + quarter resolution Gaussian pairs), a screen-space lens
-  flare anchored on the hero stars, and a baked dirty-glass map finish with ACES
-  tone mapping.
+A WebGPU star field, built only with [vgpu](https://vgpu.sh) inside Next.js.
+
+Live at **[astra.crafter.run](https://astra.crafter.run)**.
 
 Drag to rotate, hover to scatter, arrow keys to nudge.
 
+## Run it
+
 ```sh
 pnpm install
-pnpm dev          # http://localhost:3000 (needs a WebGPU-capable browser)
-pnpm check:wgsl   # validate every shader against a real WebGPU device
-pnpm og           # re-render the Open Graph card from the live scene
-pnpm typecheck
-pnpm build
-pnpm capture      # Node >= 22 + Google Chrome: headless WebGPU frames -> captures/*.png
+pnpm dev
 ```
 
-All rendering code lives in `components/spiral-galaxy/`:
+Open http://localhost:3000 in a WebGPU-capable browser.
 
-| File | Role |
-| --- | --- |
-| `field.ts` | SVG path parsing, arc-length resampling, deterministic star generation |
-| `animation.ts` | Intro, drag rotation with per-stroke lag, flow, pointer repel state |
-| `input.ts` | Pointer / keyboard glue |
-| `pipeline.ts` | vgpu resources, effects, targets and the per-frame pass chain |
-| `renderer.ts` | Owns the `Gpu` context, resize and the frame loop |
-| `SpiralGalaxy.tsx` | Client component with the canvas and the controls overlay |
-| `simulate.wgsl` | One compute thread per star |
-| `stars.wgsl` | Instanced additive point sprites |
-| `bright.wgsl`, `blur.wgsl` | Bloom |
-| `dirt.wgsl` | Procedural lens dirt, baked once |
-| `composite.wgsl` | Bloom + flare + dirty glass + ACES → sRGB, then ambient glow + vignette |
+## How it works
+
+Stars flow along five SVG strokes that draw a "6". A compute pass moves every
+star, then additive quads draw them into an HDR scene. Bloom, a lens flare and a
+dirty-glass pass finish with ACES tone mapping.
+
+All of it lives in `components/spiral-galaxy/`.
+
+## Other commands
+
+```sh
+pnpm check:wgsl   # validate every shader against a real WebGPU device
+pnpm og           # re-render the Open Graph card from the live scene
+pnpm capture      # save headless WebGPU frames to captures/
+pnpm typecheck
+pnpm build
+```
+
+`og` and `capture` need Node 22+ and Google Chrome.

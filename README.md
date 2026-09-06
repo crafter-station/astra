@@ -1,5 +1,9 @@
 # Astra
 
+[![star](https://img.shields.io/github/stars/crafter-station/astra?style=flat-square&logo=github&label=star&labelColor=05090d&color=7AB1FE)](https://github.com/crafter-station/astra)
+[![live](https://img.shields.io/badge/live-astra.crafter.run-7AB1FE?style=flat-square&labelColor=05090d&logo=vercel&logoColor=white)](https://astra.crafter.run)
+[![built with vgpu](https://img.shields.io/badge/built%20with-vgpu-7AB1FE?style=flat-square&labelColor=05090d)](https://vgpu.sh)
+
 ![Astra](./app/opengraph-image.png)
 
 A WebGPU star field, built only with [vgpu](https://vgpu.sh) inside Next.js.

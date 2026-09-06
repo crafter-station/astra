@@ -3,10 +3,23 @@
   --fg: #f5f5f7;
   --muted: rgba(245, 245, 247, 0.55);
   --panel: rgba(10, 10, 12, 0.55);
+  /* Used where backdrop-filter is missing: without the blur behind it, the
+     translucent panel reads as a smudge over the star field. */
+  --panel-opaque: rgba(10, 10, 12, 0.88);
   --border: rgba(255, 255, 255, 0.12);
   --ambient-color: #23435f;
-  --ambient-feather: 850px;
+  /* The feather is a distance, so a fixed 850px swallowed small viewports
+     whole. Tied to vmin it keeps the same proportion of edge glow at any size. */
+  --ambient-feather: clamp(260px, 62vmin, 850px);
   --ambient-opacity: 0.55;
+
+  /* One gutter drives every edge of the overlay: it shrinks with the viewport,
+     then adds whatever the device reserves for notches and home indicators. */
+  --gutter: clamp(12px, 2.6vmin, 24px);
+  --gutter-top: calc(var(--gutter) + env(safe-area-inset-top, 0px));
+  --gutter-right: calc(var(--gutter) + env(safe-area-inset-right, 0px));
+  --gutter-bottom: calc(var(--gutter) + env(safe-area-inset-bottom, 0px));
+  --gutter-left: calc(var(--gutter) + env(safe-area-inset-left, 0px));
 }
 
 * {
@@ -28,6 +41,10 @@ body {
     Arial,
     sans-serif;
   -webkit-font-smoothing: antialiased;
+  /* Embedded browsers (TV panels, appliance shells) like to inflate text on
+     rotation; the layout is already fluid, so hold the size we asked for. */
+  text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
@@ -36,7 +53,9 @@ body {
 
 .hero {
   position: relative;
-  width: 100vw;
+  /* 100vw counts the scrollbar and overflows; the fill of the block is exact. */
+  width: 100%;
+  height: 100vh;
   height: 100dvh;
   background: #000;
   overflow: hidden;
@@ -93,7 +112,8 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 24px;
+  gap: var(--gutter);
+  padding: var(--gutter-top) var(--gutter-right) var(--gutter-bottom) var(--gutter-left);
 }
 
 .overlay > * {
@@ -104,12 +124,14 @@ body {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 16px;
+  gap: clamp(8px, 2vmin, 16px);
+  min-width: 0;
 }
 
 .title {
   margin: 0;
-  font-size: 14px;
+  min-width: 0;
+  font-size: clamp(12px, 2.7vmin, 14px);
   font-weight: 500;
   letter-spacing: 0.02em;
 }
@@ -117,7 +139,7 @@ body {
 .title small {
   display: block;
   margin-top: 4px;
-  font-size: 12px;
+  font-size: clamp(10px, 2.3vmin, 12px);
   font-weight: 400;
   color: var(--muted);
 }
@@ -125,15 +147,18 @@ body {
 .panel {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  min-width: 190px;
-  padding: 12px 14px;
+  gap: clamp(6px, 1.5vmin, 8px);
+  /* Was a hard 190px min-width, which pushed the title off narrow screens.
+     It now gives way down to a width where the labels still fit on one line. */
+  flex: 0 1 auto;
+  width: clamp(148px, 44vw, 190px);
+  padding: clamp(9px, 1.9vmin, 12px) clamp(10px, 2.1vmin, 14px);
   border: 1px solid var(--border);
   border-radius: 10px;
   background: var(--panel);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  font-size: 13px;
+  font-size: clamp(11px, 2.5vmin, 13px);
 }
 
 .panel button {
@@ -151,6 +176,11 @@ body {
   background: rgba(255, 255, 255, 0.14);
 }
 
+.panel button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
 .panel label {
   display: flex;
   align-items: center;
@@ -165,20 +195,64 @@ body {
   width: 16px;
   height: 16px;
   margin: 0;
+  flex: none;
 }
 
 .bottombar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  gap: clamp(8px, 2vmin, 16px);
+  /* The hint drops to its own line rather than squeezing the link into an
+     ellipsis when the two no longer fit side by side. */
+  flex-wrap: wrap;
 }
 
 .hint {
   margin: 0;
+  min-width: 0;
+  flex: 1 1 auto;
   text-align: right;
-  font-size: 12px;
+  font-size: clamp(10px, 2.2vmin, 12px);
   color: var(--muted);
+}
+
+/* One hint per input model: a finger cannot hover or press an arrow key. */
+.hint-coarse {
+  display: none;
+}
+
+@media (hover: none), (pointer: coarse) {
+  .hint-fine {
+    display: none;
+  }
+
+  .hint-coarse {
+    display: inline;
+  }
+
+  /* Touch targets: 16px checkboxes and 6px button padding are fine for a
+     cursor and far too small for a fingertip on a wall-mounted panel. */
+  .panel {
+    gap: 10px;
+  }
+
+  .panel button {
+    padding: 10px 12px;
+  }
+
+  .panel label {
+    padding: 4px 0;
+  }
+
+  .panel input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+  }
+
+  .gh {
+    padding: 10px 14px;
+  }
 }
 
 /* GitHub link, styled like the controls panel so the two read as one system. */
@@ -186,6 +260,7 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  flex: none;
   padding: 7px 12px;
   border: 1px solid var(--border);
   border-radius: 999px;
@@ -193,7 +268,7 @@ body {
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   color: var(--muted);
-  font-size: 12px;
+  font-size: clamp(11px, 2.2vmin, 12px);
   line-height: 1;
   text-decoration: none;
   transition: color 150ms ease, background 150ms ease, border-color 150ms ease;
@@ -223,27 +298,117 @@ body {
   }
 }
 
-.status {
+/* Landscape phones and short embedded panels: the two bars are most of the
+   height, so the overlay gives the field back as much of it as it can. */
+@media (max-height: 480px) {
+  :root {
+    --gutter: 10px;
+  }
+
+  .panel {
+    gap: 6px;
+  }
+
+  .hint {
+    display: none;
+  }
+}
+
+@supports not ((backdrop-filter: blur(12px)) or (-webkit-backdrop-filter: blur(12px))) {
+  .panel,
+  .gh {
+    background: var(--panel-opaque);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Fallback: WebGPU never came up, so the scene is replaced outright.
+   -------------------------------------------------------------------------- */
+
+.fallback {
   position: absolute;
   inset: 0;
-  display: grid;
-  place-items: center;
-  padding: 24px;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(14px, 3.2vmin, 26px);
+  padding: var(--gutter-top) var(--gutter-right) var(--gutter-bottom) var(--gutter-left);
+  background: #000;
+  /* Nothing here is essential to lose, but a very short panel in landscape
+     should still be able to reach the note under the player. */
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.fallback-mark {
+  margin: 0;
   text-align: center;
+  font-size: clamp(12px, 2.7vmin, 14px);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.fallback-mark small {
+  display: block;
+  margin-top: 4px;
+  font-size: clamp(10px, 2.3vmin, 12px);
+  font-weight: 400;
   color: var(--muted);
-  font-size: 14px;
+}
+
+.fallback-video {
+  position: relative;
+  flex: none;
+  /* Bounded on both axes: the third term is the width at which a 16:9 box is
+     exactly 68% of the viewport height, so the note below never gets pushed
+     off a short screen. The vh line is the fallback where dvh is unknown. */
+  width: min(100%, 960px, 120vh);
+  width: min(100%, 960px, 120dvh);
+  aspect-ratio: 16 / 9;
+  border: 1px solid var(--border);
+  border-radius: clamp(8px, 1.6vmin, 14px);
+  overflow: hidden;
   background: #000;
 }
 
-.status strong {
+.fallback-video iframe {
+  position: absolute;
+  inset: 0;
   display: block;
-  margin-bottom: 8px;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.fallback-note {
+  margin: 0;
+  max-width: 46ch;
+  text-align: center;
+  font-size: clamp(11px, 2.4vmin, 14px);
+  line-height: 1.55;
+  color: var(--muted);
+  text-wrap: pretty;
+}
+
+.fallback-note strong {
+  display: block;
+  margin-bottom: 6px;
   color: var(--fg);
+  font-weight: 500;
+}
+
+.fallback-note code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.92em;
+  overflow-wrap: anywhere;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .panel,
-  .panel button {
+  .panel button,
+  .gh {
     transition: none;
   }
 }

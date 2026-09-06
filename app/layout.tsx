@@ -29,6 +29,9 @@ export const viewport: Viewport = {
   themeColor: "#05090d",
   width: "device-width",
   initialScale: 1,
+  // The scene is edge to edge, so it should paint under a notch or a rounded
+  // corner. This is also what makes env(safe-area-inset-*) report anything.
+  viewportFit: "cover",
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

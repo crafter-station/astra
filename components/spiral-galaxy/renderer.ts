@@ -159,7 +159,10 @@ export function createRenderer({ canvas, worldScale = 1 }: RendererOptions): Ren
   };
 
   const initialize = async () => {
-    if (typeof navigator === 'undefined' || !('gpu' in navigator)) {
+    // `'gpu' in navigator` is not enough: embedded browsers ship the property
+    // and hand back undefined, which slips past the guard and fails later
+    // inside init() with a much less obvious message.
+    if (typeof navigator === 'undefined' || !navigator.gpu) {
       throw new Error('WebGPU is not available in this browser.');
     }
 

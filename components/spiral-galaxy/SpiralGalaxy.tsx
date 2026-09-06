@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { createRenderer, type Renderer } from './renderer';
+import { Unsupported } from './Unsupported';
 
 interface Toggles {
   lensFlare: boolean;
@@ -50,6 +51,16 @@ export function SpiralGalaxy() {
     if (patch.hoverRepel !== undefined) renderer.setHoverRepel(patch.hoverRepel);
   };
 
+  // The scene is the entire page, so a dead renderer leaves nothing to overlay
+  // controls onto: the fallback replaces the hero rather than covering it.
+  if (status === 'error') {
+    return (
+      <main className="hero">
+        <Unsupported reason={error} />
+      </main>
+    );
+  }
+
   return (
     <main className="hero">
       <canvas
@@ -57,17 +68,6 @@ export function SpiralGalaxy() {
         tabIndex={0}
         aria-label="Spiral galaxy star field. Drag or use the arrow keys to rotate it; hover to scatter the stars."
       />
-
-      {status === 'error' ? (
-        <div className="status" role="alert">
-          <p>
-            <strong>Could not start the WebGPU renderer.</strong>
-            {error ?? 'WebGPU is not available in this browser.'}
-            <br />
-            Try a current Chrome, Edge or Safari with WebGPU enabled.
-          </p>
-        </div>
-      ) : null}
 
       <div className="overlay">
         <div className="topbar">
@@ -122,7 +122,12 @@ export function SpiralGalaxy() {
             </svg>
             <span>crafter-station/astra</span>
           </a>
-          <p className="hint">Drag to rotate · hover to scatter · arrow keys to nudge</p>
+          {/* Two hints, one per input model: pointer devices get the hover and
+              keyboard gestures, touch gets only what a finger can actually do. */}
+          <p className="hint">
+            <span className="hint-fine">Drag to rotate · hover to scatter · arrow keys to nudge</span>
+            <span className="hint-coarse">Drag to rotate the field</span>
+          </p>
         </div>
       </div>
     </main>

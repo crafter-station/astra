@@ -1,0 +1,202 @@
+:root {
+  color-scheme: dark;
+  --fg: #f5f5f7;
+  --muted: rgba(245, 245, 247, 0.55);
+  --panel: rgba(10, 10, 12, 0.55);
+  --border: rgba(255, 255, 255, 0.12);
+  --ambient-color: #23435f;
+  --ambient-feather: 850px;
+  --ambient-opacity: 0.55;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  background: #000;
+  color: var(--fg);
+  font-family:
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    Helvetica,
+    Arial,
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  overflow: hidden;
+}
+
+.hero {
+  position: relative;
+  width: 100vw;
+  height: 100dvh;
+  background: #000;
+  overflow: hidden;
+}
+
+/* Ambient glow + vignette behind the field, matching the launch page:
+   a deep-navy radial that only shows at the edges, then a darkening vignette. */
+.hero::before,
+.hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.hero::before {
+  background: radial-gradient(
+    ellipse farthest-corner at center,
+    transparent max(0%, calc(100% - var(--ambient-feather))),
+    var(--ambient-color) 100%
+  );
+  opacity: var(--ambient-opacity);
+}
+
+.hero::after {
+  background: radial-gradient(
+    circle,
+    transparent 47%,
+    rgba(0, 0, 0, 0.18) 72%,
+    rgba(0, 0, 0, 0.78) 100%
+  );
+}
+
+.hero canvas {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+  outline: none;
+}
+
+.hero canvas:focus-visible {
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.35);
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 24px;
+}
+
+.overlay > * {
+  pointer-events: auto;
+}
+
+.topbar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.title small {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--muted);
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 190px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--panel);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  font-size: 13px;
+}
+
+.panel button {
+  appearance: none;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--fg);
+  padding: 6px 10px;
+  font: inherit;
+  cursor: pointer;
+}
+
+.panel button:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.panel label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.panel input[type="checkbox"] {
+  accent-color: #8ab4ff;
+  width: 16px;
+  height: 16px;
+  margin: 0;
+}
+
+.hint {
+  /* Bottom-right: clear of the Next.js dev-tools badge at bottom-left. */
+  align-self: flex-end;
+  margin: 0;
+  text-align: right;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.status {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 14px;
+  background: #000;
+}
+
+.status strong {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--fg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panel,
+  .panel button {
+    transition: none;
+  }
+}

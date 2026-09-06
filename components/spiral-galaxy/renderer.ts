@@ -1,6 +1,6 @@
 // Owns the vgpu context for the hero: init, resize (targets are re-created at
 // the new size), the frame loop, input, and the runtime toggles the React
-// overlay flips. No GUI library — controls are plain methods.
+// overlay flips. No GUI library; controls are plain methods.
 
 import { clock, frameLoop, init, surface, type FrameLoopHandle, type Gpu, type Surface } from 'vgpu';
 
@@ -26,6 +26,8 @@ import {
 
 export interface RendererOptions {
   readonly canvas: HTMLCanvasElement;
+  /** Above 1 zooms the field out; the Open Graph poster uses it for margin. */
+  readonly worldScale?: number;
 }
 
 export interface RenderSize {
@@ -62,7 +64,7 @@ function bestEffort(cleanup: () => void): void {
   }
 }
 
-export function createRenderer({ canvas }: RendererOptions): Renderer {
+export function createRenderer({ canvas, worldScale = 1 }: RendererOptions): Renderer {
   let disposed = false;
   let gpu: Gpu | undefined;
   let canvasSurface: Surface | undefined;
@@ -104,7 +106,7 @@ export function createRenderer({ canvas }: RendererOptions): Renderer {
       ]);
       try {
         pixelRatio = size.dpr;
-        setBindings(effects, nextTargets, resources, { pixelRatio, repelRadius: animation.repelRadius });
+        setBindings(effects, nextTargets, resources, { pixelRatio, repelRadius: animation.repelRadius, worldScale });
       } catch (error) {
         destroyTargets(nextTargets);
         throw error;
@@ -181,7 +183,7 @@ export function createRenderer({ canvas }: RendererOptions): Renderer {
     resources = createResources(gpu, field);
     effects = createEffects(gpu, field, resources);
     targets = createTargets(gpu, canvasSurface.size);
-    setBindings(effects, targets, resources, { pixelRatio, repelRadius: animation.repelRadius });
+    setBindings(effects, targets, resources, { pixelRatio, repelRadius: animation.repelRadius, worldScale });
     await prewarm(effects, targets, resources, canvasSurface);
     if (disposed) return;
     bakeDirt(gpu, effects, resources);

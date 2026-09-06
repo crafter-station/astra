@@ -9,7 +9,8 @@
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "check:wgsl": "for f in components/spiral-galaxy/*.wgsl; do vgpu check \"$f\" --require-validation > /dev/null || exit 1; echo \"ok  $f\"; done",
-    "capture": "node scripts/capture.mjs"
+    "capture": "node scripts/capture.mjs",
+    "og": "node scripts/og.mjs"
   },
   "dependencies": {
     "next": "^16.3.4",

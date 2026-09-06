@@ -1,7 +1,7 @@
 # gpt-6-astra
 
-A from-scratch reproduction of the GPT-6 Astra launch-page star-field hero — the
-spiral galaxy — built only with [vgpu](https://vgpu.sh) (WebGPU) inside Next.js.
+A from-scratch reproduction of the GPT-6 Astra launch-page star-field hero (the
+spiral galaxy), built only with [vgpu](https://vgpu.sh) (WebGPU) inside Next.js.
 
 - A compute pass flows ~4,600 stars along the five SVG strokes that draw the "6"
   (viewBox 231x325, taken from the launch page), converges them from a scattered
@@ -16,8 +16,9 @@ Drag to rotate, hover to scatter, arrow keys to nudge.
 
 ```sh
 pnpm install
-pnpm dev          # http://localhost:3000 — needs a WebGPU-capable browser
+pnpm dev          # http://localhost:3000 (needs a WebGPU-capable browser)
 pnpm check:wgsl   # validate every shader against a real WebGPU device
+pnpm og           # re-render the Open Graph card from the live scene
 pnpm typecheck
 pnpm build
 pnpm capture      # Node >= 22 + Google Chrome: headless WebGPU frames -> captures/*.png

@@ -302,16 +302,21 @@ function srgbColor(hex: string): [number, number, number] {
   return [((value >> 16) & 255) / 255, ((value >> 8) & 255) / 255, (value & 255) / 255];
 }
 
-/** Orthographic world extent: taller on portrait viewports so the arms still fit. */
-export function worldSize(size: readonly [number, number]): [number, number] {
+/**
+ * Orthographic world extent: taller on portrait viewports so the arms still fit.
+ * `scale` above 1 widens the view, which pulls the field away from the edges.
+ */
+export function worldSize(size: readonly [number, number], scale = 1): [number, number] {
   const aspect = size[0] / Math.max(1, size[1]);
-  const height = aspect < 0.72 ? 12.7 : 10.9;
+  const height = (aspect < 0.72 ? 12.7 : 10.9) * Math.max(scale, 0.1);
   return [height * aspect, height];
 }
 
 export interface ViewOptions {
   readonly pixelRatio: number;
   readonly repelRadius: number;
+  /** Above 1 zooms out; used by the Open Graph poster framing. */
+  readonly worldScale?: number;
 }
 
 export function setBindings(
@@ -321,7 +326,7 @@ export function setBindings(
   view: ViewOptions,
 ): void {
   const size = targets.scene.size;
-  const world = worldSize(size);
+  const world = worldSize(size, view.worldScale ?? 1);
   effects.simulate.set({
     params: {
       viewport: [size[0], size[1]],

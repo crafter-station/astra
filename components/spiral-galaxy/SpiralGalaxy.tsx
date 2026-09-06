@@ -72,7 +72,7 @@ export function SpiralGalaxy() {
       <div className="overlay">
         <div className="topbar">
           <h1 className="title">
-            Spiral Galaxy
+            Astra
             <small>{status === 'loading' ? 'Compiling shaders…' : 'WebGPU · vgpu'}</small>
           </h1>
 

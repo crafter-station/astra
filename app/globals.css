@@ -200,3 +200,57 @@ body {
     transition: none;
   }
 }
+
+/* ---------------------------------------------------------------------------
+   /og: poster framing captured at 1200x630 by scripts/og.mjs.
+   -------------------------------------------------------------------------- */
+
+.og {
+  position: relative;
+  width: 100vw;
+  height: 100dvh;
+  overflow: hidden;
+  background: #000;
+}
+
+.og canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.og-plate {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 32px;
+  padding: 56px 64px;
+  pointer-events: none;
+}
+
+.og-mark h1 {
+  margin: 0;
+  font-size: 92px;
+  line-height: 0.95;
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  color: #f5f6fb;
+}
+
+.og-mark p {
+  margin: 16px 0 0;
+  font-size: 25px;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  color: rgba(245, 246, 251, 0.62);
+}
+
+.og-url {
+  padding-bottom: 10px;
+  font-size: 21px;
+  letter-spacing: 0.01em;
+  color: rgba(245, 246, 251, 0.42);
+  white-space: nowrap;
+}
